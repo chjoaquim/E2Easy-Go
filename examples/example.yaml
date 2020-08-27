@@ -1,14 +1,9 @@
-# E2Easy-Go
-E2Easy-Go
-
-Example .yaml:
-````
 name: contract_retention
 steps:
   - name: create_contract
     path: https://contract.api.com.br
     method: POST
-    body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG\" }"
+    body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG1\" }"
     vars:
       response: "response.body"
   - name: get_retention
@@ -16,4 +11,3 @@ steps:
     method: GET
     vars:
       retention: "response.body.id"
-``

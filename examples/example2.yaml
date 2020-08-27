@@ -1,0 +1,13 @@
+name: contract_retention
+steps:
+#  - name: create_contract
+#    path: https://contract.api.com.br
+#    method: POST
+#    body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG\" }"
+#    vars:
+#      response: "response.body"
+  - name: get_retention
+    path: https://mail-generator.herokuapp.com/generate?domain=gmail
+    method: GET
+    vars:
+      retention: "response.body.id"
