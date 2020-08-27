@@ -1,4 +1,4 @@
 compile:
 	if [ -d "bin" ]; then rm -Rf bin; fi
-	go mod download
-	go build -o bin/E2Easy-go .
+	cd src; go mod download
+	cd src; go build -o ../bin/E2Easy-go .
