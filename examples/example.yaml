@@ -5,9 +5,9 @@ steps:
     method: POST
     body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG1\" }"
     vars:
-      response: "response.body"
+      myResponse: "{body}"
   - name: get_retention
-    path: https://retention.api.com.br
+    path: https://retention.api.com.br/$myResponse
     method: GET
     vars:
-      retention: "response.body.id"
+      retention: "{body.id}"

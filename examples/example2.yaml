@@ -5,9 +5,23 @@ steps:
 #    method: POST
 #    body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG\" }"
 #    vars:
-#      response: "response.body"
-  - name: get_retention
+#      response: ${response.body}
+  - name: get_gmail
     path: https://mail-generator.herokuapp.com/generate?domain=gmail
     method: GET
+  - name: get_hotmal
+    path: https://mail-generator.herokuapp.com/generate?domain=hotmail
+    method: GET
     vars:
-      retention: "response.body.id"
+      fullBody: response.body
+      email: response.body.mail
+      statusCode: response.statusCode
+    tests:
+      - name: return_hotmal
+        expected: "hotmail"
+        actual: ${email}
+        type: equals
+      - name: status_ok
+        expected: 500
+        actual: ${statusCode}
+        type: distinct

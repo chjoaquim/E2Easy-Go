@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
-	"github.com/carloshjoaquim/E2Easy-Go/rest"
+	"github.com/carloshjoaquim/E2Easy-Go/processor"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,16 +14,12 @@ func main() {
 	var c file_reader.Config
 	c.ReadFile()
 
-	log.Infoln(c)
-	log.Println("Trying to CALL RESTY...")
+	for _, s := range c.Steps {
+		resultStep := processor.RunStep(s)
+		pretty, _ := json.MarshalIndent(resultStep, "", "    ")
+		log.Infof("Response: \n %+v", string(pretty))
 
-	response, err := rest.Get(c.Steps[0].Path)
-	if err != nil {
-		log.Error("Error whit GET")
+		vars := processor.GetVarsFromResponse(s.Vars, resultStep)
+		log.Infof("Vars: \n %+v", vars)
 	}
-
-	var body interface{}
-	err = json.Unmarshal(response.Body, &body)
-
-	log.Infof("Response: %s", body)
 }
