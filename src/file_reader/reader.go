@@ -19,6 +19,14 @@ type Step struct {
 	Method   string            `yaml:"method"`
 	Body     string            `yaml:body,omitempty`
 	Vars     map[string]string `yaml:"vars,omitempty"`
+	Tests    []Tests           `yaml:"tests"`
+}
+
+type Tests struct {
+	Name     string `yaml:"name"`
+	Expected string `yaml:"expected"`
+	Actual   string `yaml:"actual"`
+	Type     string `yaml:"type"`
 }
 
 func (c *Config) ReadFile() *Config {

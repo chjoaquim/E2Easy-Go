@@ -19,7 +19,17 @@ func main() {
 		pretty, _ := json.MarshalIndent(resultStep, "", "    ")
 		log.Infof("Response: \n %+v", string(pretty))
 
-		vars := processor.GetVarsFromResponse(s.Vars, resultStep)
-		log.Infof("Vars: \n %+v", vars)
+		processor.GetVarsFromResponse(s.Vars, resultStep)
+
+		log.Infoln("Running Tests ... ")
+		testsResult := processor.ProcessTests(s.Tests)
+		for _, tr := range testsResult {
+			log.Infof("\nName: %v \n" +
+				"Type: %v \n" +
+				"Expected: %v \n" +
+				"Actual: %v \n" +
+				"Result: %v \n", tr.Name, tr.Type, tr.Expected, tr.Actual, tr.Result)
+		}
+		log.Infoln("End ofTests ... ")
 	}
 }

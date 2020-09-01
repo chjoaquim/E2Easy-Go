@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
+var (
+	globalVars = make(map[string]string, 0)
+)
+
 func GetVarsFromResponse(expectedVars map[string]string, result StepResult) map[string]string {
-	globalVars := make(map[string]string, 0)
 	if len(expectedVars) > 0 {
 		for k, v := range expectedVars {
 			evaluated := getValueFromResult(v, result)
@@ -17,6 +20,12 @@ func GetVarsFromResponse(expectedVars map[string]string, result StepResult) map[
 	}
 
 	return globalVars
+}
+
+func GetValueOfVar(varName string) string {
+	cleanedVar := strings.ReplaceAll(strings.ReplaceAll(varName, "${", ""), "}", "")
+
+	return strings.ReplaceAll(strings.ReplaceAll(globalVars[cleanedVar], "{", ""), "}", "")
 }
 
 func getValueFromResult(varName string, result StepResult) string {
@@ -51,3 +60,4 @@ func getValueFromResult(varName string, result StepResult) string {
 
 	return value
 }
+
