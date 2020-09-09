@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
 	resty "github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -25,7 +26,8 @@ func GetRestClient() *http.Client {
 	return restClient.GetClient()
 }
 
-func Post(path string, body string) (*CallerResponse, error) {
+func Post(path string, body string, headers []file_reader.Headers) (*CallerResponse, error) {
+	setHeaders(headers)
 	response, err := restClient.
 		SetHostURL(path).R().
 		SetBody(body).
@@ -46,7 +48,8 @@ func Post(path string, body string) (*CallerResponse, error) {
 	return callerResponse, nil
 }
 
-func Get(path string) (*CallerResponse, error) {
+func Get(path string, headers []file_reader.Headers) (*CallerResponse, error) {
+	setHeaders(headers)
 	response, err := restClient.
 		SetHostURL(path).R().
 		Get("")
@@ -64,4 +67,12 @@ func Get(path string) (*CallerResponse, error) {
 	}
 
 	return callerResponse, nil
+}
+
+func setHeaders(headers []file_reader.Headers) {
+	if len(headers) > 0 {
+		for _, header := range headers {
+			restClient.SetHeader(header.Name, header.Value)
+		}
+	}
 }

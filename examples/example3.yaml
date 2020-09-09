@@ -1,0 +1,32 @@
+name: contract_retention
+steps:
+  - name: create_contract
+    path: http://movilepay-api.ifood-devel.com.br/integrations/contracts/v0/partners/MOVILEPAY/types/LOAN/contracts
+    method: POST
+    body: "{
+              \"reference_id\": \"TST-E2E004\", \"ccb_number\": \"1234556\", \"signed_at\": \"2020-07-20T19:29:42.963Z\",
+              \"signed_contract_url\": \"\", \"tax_payer_id\": \"21270373000152\", \"received_amount_cents\": 1, \"total_amount_cents\": 2,
+              \"start_at\": \"2020-07-27T00:00:42.963Z\", \"end_at\": \"2021-01-20T00:00:42.963Z\", \"description\": \"Test E2E\",
+              \"provider\": { \"tax_payer_id\": \"37016613000127\", \"name\": \"MOVILEPAY\", \"bank_account\":
+              { \"holder_document\": \"37016613000127\", \"holder_name\": \"MOVILEPAY\" } }, \"installments\":
+              [{ \"reference_id\": \"I0001\", \"due_at\": \"2020-10-06T18:00:00.000Z\", \"amount_cents\": 2 }]
+          }"
+    headers:
+      - name: "API-KEY"
+        value: "Z8LM1y7LMTgbUFgJ4maMKGTdsIR8Nb/7lmvlOrGxCwRTGwZmpmXkCSFkOD4Rm/0o"
+    vars:
+      id: response.body.account_service_id
+      accountReference: response.body.account_reference
+  - name: calculate_retention
+    path: http://internal-ac6739d494eec11ea93d70a7af6da2e6-2130397741.sa-east-1.elb.amazonaws.com/retention/calculate
+    method: POST
+    body: "{ \"account_reference\": \"02389aad-436b-4186-af4f-af298fc1e7c1\", \"reference_id\": \"TST-E2E-GO\",
+    \"amount\": 10, \"retention_type\": \"WALLET_DIGITAL_ACCOUNT\"}"
+    vars:
+      referenceId: response.body.reference_id
+      retentions: response.body.retentions
+    tests:
+      - name: same_reference
+        expected: "TST-E2E-GO"
+        actual: ${referenceId}
+        type: equals

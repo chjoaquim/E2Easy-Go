@@ -18,8 +18,14 @@ type Step struct {
 	Path     string            `yaml:"path"`
 	Method   string            `yaml:"method"`
 	Body     string            `yaml:body,omitempty`
+	Headers  []Headers         `yaml:headers,omitempty`
 	Vars     map[string]string `yaml:"vars,omitempty"`
-	Tests    []Tests           `yaml:"tests"`
+	Tests    []Tests           `yaml:"tests,omitempty"`
+}
+
+type Headers struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
 }
 
 type Tests struct {

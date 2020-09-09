@@ -20,7 +20,7 @@ func RunStep(step file_reader.Step) StepResult {
 	switch step.Method {
 	case "GET":
 		{
-			result, err := rest.Get(step.Path)
+			result, err := rest.Get(step.Path, step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a GET request %v", err)
 				stepResult = getErrorResult(err)
@@ -30,7 +30,7 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "POST":
 		{
-			result, err := rest.Post(step.Path, step.Body)
+			result, err := rest.Post(step.Path, step.Body, step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a POST request %v", err)
 				stepResult = getErrorResult(err)
