@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
 	"github.com/carloshjoaquim/E2Easy-Go/processor"
 	log "github.com/sirupsen/logrus"
@@ -16,9 +15,6 @@ func main() {
 
 	for _, s := range c.Steps {
 		resultStep := processor.RunStep(s)
-		pretty, _ := json.MarshalIndent(resultStep, "", "    ")
-		log.Infof("Response: \n %+v", string(pretty))
-
 		processor.GetVarsFromResponse(s.Vars, resultStep)
 
 		log.Infoln("Running Tests ... ")
@@ -30,6 +26,6 @@ func main() {
 				"Actual: %v \n" +
 				"Result: %v \n", tr.Name, tr.Type, tr.Expected, tr.Actual, tr.Result)
 		}
-		log.Infoln("End ofTests ... ")
+		log.Infoln("End of Tests ... ")
 	}
 }

@@ -2,7 +2,6 @@ package processor
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 )
@@ -31,7 +30,6 @@ func GetValueOfVar(varName string) string {
 func getValueFromResult(varName string, result StepResult) string {
 	values := strings.Split(varName, ".")
 	var value string
-	log.Infof("varName: %s", varName)
 	switch values[0] {
 	case "response": {
 		switch values[1] {
@@ -40,11 +38,9 @@ func getValueFromResult(varName string, result StepResult) string {
 				return result.Message
 			} else  {
 				bodyJson := []byte(result.Message)
-				log.Infof("in Body: %s", bodyJson)
 				c := make(map[string]json.RawMessage)
 
 				json.Unmarshal(bodyJson, &c)
-				log.Infof("in C: %s", c)
 				value = string(c[values[2]])
 			}
 			break
