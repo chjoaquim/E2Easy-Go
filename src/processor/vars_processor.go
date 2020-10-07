@@ -25,7 +25,7 @@ func GetVarsFromResponse(expectedVars map[string]string, result StepResult) map[
 func GetValueOfVar(varName string) string {
 	cleanedVar := strings.ReplaceAll(strings.ReplaceAll(varName, "${", ""), "}", "")
 
-	return strings.ReplaceAll(strings.ReplaceAll(globalVars[cleanedVar], "{", ""), "}", "")
+	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(globalVars[cleanedVar], "{", ""), "}", ""), string('"'), "")
 }
 
 func getValueFromResult(varName string, result StepResult) string {

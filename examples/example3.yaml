@@ -30,3 +30,7 @@ steps:
         expected: "TST-E2E-GO"
         actual: ${referenceId}
         type: equals
+      - name: no_retentions
+        actual: retentions
+        expected: "[]"
+        type: equals
