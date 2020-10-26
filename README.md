@@ -7,9 +7,7 @@ for validations or next flows call.
 The library runs on the console where it is possible to pass an input file (.yaml) 
 to be consumed, this file defines the steps and validations of the end-to-end test.
 
-![alt text](https://https://github.com/carloshjoaquim/E2Easy-Go/images/master/cmd.png?raw=true)
-
-
+![execution](https://github.com/carloshjoaquim/E2Easy-Go/blob/master/images/cmd.png?raw=true)
 
 #### Example 1:
 ##### To create a simple GET call to an URL and validate the result:
