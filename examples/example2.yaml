@@ -16,3 +16,13 @@ steps:
         expected: 200
         actual: ${statusCode}
         type: equals
+  - name: contrato2
+    path: https://mail-generator.herokuapp.com/generate?domain=${email}
+    method: GET
+    vars:
+      email2: response.body.mail
+    tests:
+      - name: return_hotmal
+        expected: "hotmail"
+        actual: ${email2}
+        type: contains
