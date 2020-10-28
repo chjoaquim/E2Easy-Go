@@ -48,6 +48,28 @@ func Post(path string, body string, headers []file_reader.Headers) (*CallerRespo
 	return callerResponse, nil
 }
 
+func Put(path string, body string, headers []file_reader.Headers) (*CallerResponse, error) {
+	setHeaders(headers)
+	response, err := restClient.
+		SetHostURL(path).R().
+		SetBody(body).
+		Put("")
+
+	if err != nil {
+		log.Error("Error when trying to perform a PUT request due to: %s", err)
+		return nil, err
+	}
+
+	callerResponse := &CallerResponse{
+		Body:            response.Body(),
+		Status:          response.Status(),
+		StatusCode:      response.StatusCode(),
+		RequestDuration: response.Time(),
+	}
+
+	return callerResponse, nil
+}
+
 func Get(path string, headers []file_reader.Headers) (*CallerResponse, error) {
 	setHeaders(headers)
 	response, err := restClient.

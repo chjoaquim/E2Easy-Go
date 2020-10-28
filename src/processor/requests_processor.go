@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"fmt"
 	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
 	"github.com/carloshjoaquim/E2Easy-Go/rest"
 	log "github.com/sirupsen/logrus"
@@ -21,13 +22,7 @@ func RunStep(step file_reader.Step) StepResult {
 	switch step.Method {
 	case "GET":
 		{
-			if strings.Contains(step.Path, "${") {
-				for k := range globalVars {
-					log.Println("VAR %v", k)
-					step.Path = strings.ReplaceAll(step.Path, k, GetValueOfVar(k))
-				}
-			}
-			result, err := rest.Get(step.Path, step.Headers)
+			result, err := rest.Get(replaceVars(step.Path), step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a GET request %v", err)
 				stepResult = getErrorResult(err)
@@ -37,10 +32,19 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "POST":
 		{
-
-			result, err := rest.Post(step.Path, step.Body, step.Headers)
+			result, err := rest.Post(replaceVars(step.Path), replaceVars(step.Body), step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a POST request %v", err)
+				stepResult = getErrorResult(err)
+				break
+			}
+			stepResult = getSuccessResult(result)
+		}
+	case "PUT":
+		{
+			result, err := rest.Put(replaceVars(step.Path), replaceVars(step.Body), step.Headers)
+			if err != nil {
+				log.Errorf("Error when trying to execute a PUT request %v", err)
 				stepResult = getErrorResult(err)
 				break
 			}
@@ -66,4 +70,14 @@ func getSuccessResult(result *rest.CallerResponse) StepResult {
 		Time:    result.RequestDuration,
 		StatusCode: result.StatusCode,
 	}
+}
+
+func replaceVars(value string) string {
+	if strings.Contains(value, "${") {
+		for k := range globalVars {
+			value = strings.ReplaceAll(value, fmt.Sprintf("${%s}", k), GetValueOfVar(k))
+		}
+	}
+
+	return value
 }
