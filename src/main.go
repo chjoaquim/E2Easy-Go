@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
-	"github.com/carloshjoaquim/E2Easy-Go/processor"
+	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
+	"github.com/carloshjoaquim/E2Easy-Go/src/processor"
 	log "github.com/sirupsen/logrus"
 )
 

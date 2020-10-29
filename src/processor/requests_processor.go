@@ -2,8 +2,8 @@ package processor
 
 import (
 	"fmt"
-	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
-	"github.com/carloshjoaquim/E2Easy-Go/rest"
+	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
+	"github.com/carloshjoaquim/E2Easy-Go/src/rest"
 	log "github.com/sirupsen/logrus"
 	"strings"
 	"time"

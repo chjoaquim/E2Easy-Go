@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
+	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
 	resty "github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"net/http"

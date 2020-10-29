@@ -1,7 +1,7 @@
 package processor
 
 import (
-	"github.com/carloshjoaquim/E2Easy-Go/file_reader"
+	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
 	"strings"
 )
 
