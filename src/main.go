@@ -29,3 +29,7 @@ func main() {
 		log.Infoln("End of Tests ... ")
 	}
 }
+
+func RunE2E() {
+	main()
+}
