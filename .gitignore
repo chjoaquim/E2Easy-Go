@@ -18,4 +18,4 @@
 *.DS_Store
 
 # examples
-./examples/example*.yait sml
+./examples/example*.yaml
