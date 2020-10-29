@@ -1,4 +1,4 @@
-package main
+package runner
 
 import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
