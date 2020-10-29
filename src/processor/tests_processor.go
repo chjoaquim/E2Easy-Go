@@ -2,6 +2,7 @@ package processor
 
 import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
+	"strconv"
 	"strings"
 )
 
@@ -86,4 +87,15 @@ func verifyNil(actual interface{}) bool {
 
 func verifyNotNil(actual interface{}) bool {
 	return actual != nil
+}
+
+func SatisfiesCondition(s *file_reader.Step) bool{
+	if s.Condition == "" {
+		return true
+	}
+
+	replaced := ReplaceVars(s.Condition)
+	boolValue, _ := strconv.ParseBool(replaced)
+
+	return boolValue
 }

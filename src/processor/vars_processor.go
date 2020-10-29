@@ -2,6 +2,7 @@ package processor
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -31,25 +32,28 @@ func getValueFromResult(varName string, result StepResult) string {
 	values := strings.Split(varName, ".")
 	var value string
 	switch values[0] {
-	case "response": {
-		switch values[1] {
-		case "body": {
-			if len(values) == 2 {
-				return result.Message
-			} else  {
-				bodyJson := []byte(result.Message)
-				c := make(map[string]json.RawMessage)
+	case "response":
+		{
+			switch values[1] {
+			case "body":
+				{
+					if len(values) == 2 {
+						return result.Message
+					} else {
+						bodyJson := []byte(result.Message)
+						c := make(map[string]json.RawMessage)
 
-				json.Unmarshal(bodyJson, &c)
-				value = string(c[values[2]])
+						json.Unmarshal(bodyJson, &c)
+						value = string(c[values[2]])
+					}
+					break
+				}
+			case "statusCode":
+				{
+					value = strconv.Itoa(result.StatusCode)
+				}
 			}
-			break
 		}
-		case "statusCode": {
-			value = strconv.Itoa(result.StatusCode)
-		}
-		}
-	}
 	default:
 		value = ""
 	}
@@ -57,3 +61,22 @@ func getValueFromResult(varName string, result StepResult) string {
 	return value
 }
 
+func AddTestVar(varName string, testResult []TestResult, configName string) {
+	testError := false
+	for _, t := range testResult {
+		testError = testError && t.Result
+	}
+
+	globalTests, _:= strconv.ParseBool(globalVars[configName])
+	globalVars[configName] = fmt.Sprintf("%v", globalTests && testError)
+	globalVars[varName] = fmt.Sprintf("%v", testError)
+}
+
+func ReplaceVars(value string) string {
+	if strings.Contains(value, "${") {
+		for k := range globalVars {
+			value = strings.ReplaceAll(value, fmt.Sprintf("${%s}", k), GetValueOfVar(k))
+		}
+	}
+	return value
+}

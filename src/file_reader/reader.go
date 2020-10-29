@@ -14,13 +14,14 @@ type Config struct {
 }
 
 type Step struct {
-	StepName string            `yaml:"name"`
-	Path     string            `yaml:"path"`
-	Method   string            `yaml:"method"`
-	Body     string            `yaml:body,omitempty`
-	Headers  []Headers         `yaml:headers,omitempty`
-	Vars     map[string]string `yaml:"vars,omitempty"`
-	Tests    []Tests           `yaml:"tests,omitempty"`
+	StepName  string            `yaml:"name"`
+	Condition string	        `yaml:"condition,omitempty"`
+	Path      string            `yaml:"path"`
+	Method    string            `yaml:"method"`
+	Body      string            `yaml:body,omitempty`
+	Headers   []Headers         `yaml:headers,omitempty`
+	Vars      map[string]string `yaml:"vars,omitempty"`
+	Tests     []Tests           `yaml:"tests,omitempty"`
 }
 
 type Headers struct {
