@@ -94,7 +94,8 @@ func SatisfiesCondition(s *file_reader.Step) bool {
 		return true
 	}
 
-	replaced := ReplaceVars(s.Condition)
+	replaced := strings.ReplaceAll(s.Condition, "not", "")
+	replaced = ReplaceVars(replaced)
 	boolValue, _ := strconv.ParseBool(replaced)
 	if strings.Contains(s.Condition, "not") {
 		return !boolValue
