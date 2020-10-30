@@ -13,7 +13,7 @@ func RunE2E() {
 
 	var c file_reader.Config
 	c.ReadFile()
-	processor.InitGlobalTest(fmt.Sprintf("%s.allTestsPassed", c.TestName))
+	processor.InitGlobalVars(c)
 	for _, s := range c.Steps {
 		if processor.SatisfiesCondition(&s) {
 			resultStep := processor.RunStep(s)

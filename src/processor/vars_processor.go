@@ -3,6 +3,8 @@ package processor
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
+	"github.com/google/uuid"
 	"strconv"
 	"strings"
 )
@@ -72,7 +74,18 @@ func AddTestVar(varName string, testResult []TestResult, configName string) {
 	globalVars[varName] = fmt.Sprintf("%v", testError)
 }
 
-func InitGlobalTest(configName string) {
+func InitGlobalVars(c file_reader.Config) {
+	for _, s := range c.Steps {
+		for n, v := range s.Vars {
+			if v == "${UUID()}" {
+				globalVars[n] = fmt.Sprintf("%s", uuid.New())
+			}
+		}
+	}
+	initGlobalTest(c.TestName)
+}
+
+func initGlobalTest(configName string) {
 	globalVars[configName] = fmt.Sprintf("%v", true)
 }
 

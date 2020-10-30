@@ -6,6 +6,7 @@ steps:
     body: "{ \"name\": \"tst\", \"age\": 27, \"type\": \"GOLANG1\" }"
     vars:
       myResponse: "{body}"
+      varGuid: ${UUID()}
   - name: get_retention
     path: https://retention.api.com.br/$myResponse
     method: GET
