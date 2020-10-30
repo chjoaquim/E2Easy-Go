@@ -41,10 +41,11 @@ func getValueFromResult(varName string, result StepResult) string {
 						return result.Message
 					} else {
 						bodyJson := []byte(result.Message)
-						c := make(map[string]json.RawMessage)
-
+						c := make(map[string]interface{})
 						json.Unmarshal(bodyJson, &c)
-						value = string(c[values[2]])
+
+						parsed, _ := findMapVar(c, removeSliceItems(values, 2)...)
+						value = fmt.Sprintf("%s", parsed)
 					}
 					break
 				}
@@ -57,7 +58,6 @@ func getValueFromResult(varName string, result StepResult) string {
 	default:
 		value = ""
 	}
-
 	return value
 }
 
@@ -87,4 +87,30 @@ func ReplaceVars(value string) string {
 
 func AppendVar(varName string, value string) {
 	globalVars[varName] = globalVars[varName] + value
+}
+
+func removeSliceItems(slice []string, n int) []string {
+	i := 0
+	for i < n {
+		slice = append(slice[:0], slice[1:]...)
+		i += 1
+	}
+	return slice
+}
+
+func findMapVar(m map[string]interface{}, ks ...string) (rval interface{}, err error) {
+	var ok bool
+
+	if len(ks) == 0 {
+		return nil, fmt.Errorf("%s needs at least one key", m)
+	}
+	if rval, ok = m[ks[0]]; !ok {
+		return nil, fmt.Errorf("key not found; remaining keys: %v", ks)
+	} else if len(ks) == 1 { // we've reached the final key
+		return rval, nil
+	} else if m, ok = rval.(map[string]interface{}); !ok {
+		return nil, fmt.Errorf("malformed structure at %#v", rval)
+	} else { // 1+ more keys
+		return findMapVar(m, ks[1:]...)
+	}
 }
