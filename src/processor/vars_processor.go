@@ -70,14 +70,14 @@ func getValueFromResult(varName string, result StepResult) string {
 }
 
 func AddTestVar(varName string, testResult []TestResult, configName string) {
-	testError := false
+	testPassed := true
 	for _, t := range testResult {
-		testError = testError && t.Result
+		testPassed = testPassed && t.Result
 	}
 
 	globalTests, _ := strconv.ParseBool(globalVars[configName])
-	globalVars[configName] = fmt.Sprintf("%v", globalTests && testError)
-	globalVars[varName] = fmt.Sprintf("%v", testError)
+	globalVars[configName] = fmt.Sprintf("%v", globalTests && testPassed)
+	globalVars[varName] = fmt.Sprintf("%v", testPassed)
 }
 
 func InitGlobalVars(c file_reader.Config) {

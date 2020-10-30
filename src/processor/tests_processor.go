@@ -52,7 +52,7 @@ func ProcessTests(tests []file_reader.Tests) []TestResult {
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
-					Expected: t.Expected,
+					Expected: "NOT_NIL",
 					Actual:   GetValueOfVar(t.Actual),
 					Result:   verifyNotNil(GetValueOfVar(t.Actual)),
 				})
@@ -62,7 +62,7 @@ func ProcessTests(tests []file_reader.Tests) []TestResult {
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
-					Expected: t.Expected,
+					Expected: "NIL",
 					Actual:   GetValueOfVar(t.Actual),
 					Result:   verifyNil(GetValueOfVar(t.Actual)),
 				})
@@ -94,12 +94,14 @@ func SatisfiesCondition(s *file_reader.Step) bool {
 		return true
 	}
 
-	replaced := strings.ReplaceAll(s.Condition, "not", "")
-	replaced = ReplaceVars(replaced)
-	boolValue, _ := strconv.ParseBool(replaced)
 	if strings.Contains(s.Condition, "not") {
+		replaced := strings.ReplaceAll(s.Condition, "not", "")
+		replaced = strings.TrimSpace(ReplaceVars(replaced))
+		boolValue, _ := strconv.ParseBool(replaced)
 		return !boolValue
 	} else {
+		replaced := strings.TrimSpace(ReplaceVars(s.Condition))
+		boolValue, _ := strconv.ParseBool(replaced)
 		return boolValue
 	}
 }

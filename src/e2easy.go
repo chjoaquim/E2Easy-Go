@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func RunE2E() {
+func main() {
 	log.Infoln("Hello E2E ! ... ")
 	ConfigureFlags()
 
