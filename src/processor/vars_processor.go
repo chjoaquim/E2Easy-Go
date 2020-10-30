@@ -47,7 +47,12 @@ func getValueFromResult(varName string, result StepResult) string {
 						json.Unmarshal(bodyJson, &c)
 
 						parsed, _ := findMapVar(c, removeSliceItems(values, 2)...)
-						value = fmt.Sprintf("%s", parsed)
+						pString := fmt.Sprintf("%s", parsed)
+						if strings.Contains(pString,"float64") {
+							cv, _ :=  strconv.ParseFloat(pString, 64)
+							value = fmt.Sprintf("%v", cv)
+						}
+						value = pString
 					}
 					break
 				}
