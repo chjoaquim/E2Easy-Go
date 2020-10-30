@@ -4,6 +4,7 @@ import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
 	"github.com/carloshjoaquim/E2Easy-Go/src/rest"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -30,7 +31,7 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "POST":
 		{
-			result, err := rest.Post(ReplaceVars(step.Path), ReplaceVars(step.Body), step.Headers)
+			result, err := rest.Post(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a POST request %v", err)
 				stepResult = getErrorResult(err)
@@ -40,7 +41,7 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "PUT":
 		{
-			result, err := rest.Put(ReplaceVars(step.Path), ReplaceVars(step.Body), step.Headers)
+			result, err := rest.Put(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers)
 			if err != nil {
 				log.Errorf("Error when trying to execute a PUT request %v", err)
 				stepResult = getErrorResult(err)

@@ -15,7 +15,7 @@ type Config struct {
 
 type Step struct {
 	StepName  string            `yaml:"name"`
-	Condition string	        `yaml:"condition,omitempty"`
+	Condition string            `yaml:"condition,omitempty"`
 	Path      string            `yaml:"path"`
 	Method    string            `yaml:"method"`
 	Body      string            `yaml:body,omitempty`

@@ -1,0 +1,81 @@
+name: credit_flow
+steps:
+  - name: create_lead
+    path: https://movilepay-credit.aws.dev.k8s.ifood-devel.com.br/api/v1/leads/99762968000112
+    method: POST
+    body: "{
+              \"company_type\": \"MEI\", \"email\": \"carlos.joaquim@ifood.com.br\", \"telephone\": \"5519996346863\",
+              \"account_reference\": \"c1963ae6-53b4-4b5e-8c9c-9f60e970ed53\", \"business_name\": \"Carlos Test E2E\",
+              \"corporate_name\": \"Carlos Test E2E Corp.\"
+          }"
+    vars:
+      statusCodeCreateLead: response.statusCode
+    tests:
+      - name: status_created
+        expected: 201
+        actual: ${statusCodeCreateLead}
+        type: equals
+  - name: lead_stablisment
+    path: https://movilepay-credit.aws.dev.k8s.ifood-devel.com.br/api/v1/leads/99762968000112/establishment
+    method: PUT
+    body: "{
+             \"business_name\": \"E2E Carlos\", \"website\": \"www.meusite.com.br\", \"address\": {
+               \"cep\": \"13076001\", \"street_name\": \"Rua desconhecida\", \"street_number\": 2,
+               \"additional_info\": \"Rua sem saida\"}
+          }"
+    vars:
+      statusCodeStablisment: response.statusCode
+    tests:
+      - name: status_ok
+        expected: 200
+        actual: ${statusCodeStablisment}
+        type: equals
+  - name: revenues
+    path: https://movilepay-credit.aws.dev.k8s.ifood-devel.com.br/api/v1/leads/99762968000112/revenues
+    method: POST
+    body: "{
+             \"revenues\": [
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-09-01T00:00:00Z\"},
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-08-01T00:00:00Z\"},
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-07-01T00:00:00Z\"},
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-06-01T00:00:00Z\"},
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-05-01T00:00:00Z\"},
+                {\"total_bag\": 999999, \"total_fee\": 10, \"competence\": \"2020-04-01T00:00:00Z\"}
+              ]
+            }"
+    vars:
+      amountCentsMax: response.body.amount_cents_max
+      amountCentsMin: response.body.amount_cents_min
+      statusCodeRevenues: response.statusCode
+    tests:
+      - name: verify_min_amount
+        expected: 350000
+        actual: ${amountCentsMin}
+        type: equals
+      - name: status_created
+        expected: 201
+        actual: ${statusCodeRevenues}
+        type: equals
+  - name: simulations
+    path: https://movilepay-credit.aws.dev.k8s.ifood-devel.com.br/api/v1/leads/99762968000112/simulations
+    method: POST
+    body: "{
+             \"amount_cents\": ${amountCentsMin}, \"installments_number\": 12, \"grace_period_days\": 30
+          }"
+    vars:
+      statusCodeSimulations: response.statusCode
+    tests:
+      - name: status_ok
+        expected: 200
+        actual: ${statusCodeSimulations}
+        type: equals
+  - name: notify_slack
+    condition: ! ${credit_flow.allTestsPassed}
+    path: https://movilepay-notification-service.aws.dev.k8s.ifood-devel.com.br/notifications
+    method: POST
+    body: "{
+             \"notification_flow_name\": \"MOVILEPAY_E2E_NOTIFICATION_ERROR\", \"variables\": {
+              \"ENVIRONMENT\": \"DEV\", \"MESSAGE\": \"Credit - E2E Test Executed with error:
+              ${credit_flow.tests.failed}
+              \"}
+          }"

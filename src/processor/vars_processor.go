@@ -67,9 +67,13 @@ func AddTestVar(varName string, testResult []TestResult, configName string) {
 		testError = testError && t.Result
 	}
 
-	globalTests, _:= strconv.ParseBool(globalVars[configName])
+	globalTests, _ := strconv.ParseBool(globalVars[configName])
 	globalVars[configName] = fmt.Sprintf("%v", globalTests && testError)
 	globalVars[varName] = fmt.Sprintf("%v", testError)
+}
+
+func InitGlobalTest(configName string) {
+	globalVars[configName] = fmt.Sprintf("%v", true)
 }
 
 func ReplaceVars(value string) string {
@@ -79,4 +83,8 @@ func ReplaceVars(value string) string {
 		}
 	}
 	return value
+}
+
+func AppendVar(varName string, value string) {
+	globalVars[varName] = globalVars[varName] + value
 }

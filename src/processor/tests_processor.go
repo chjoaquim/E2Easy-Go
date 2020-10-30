@@ -89,11 +89,10 @@ func verifyNotNil(actual interface{}) bool {
 	return actual != nil
 }
 
-func SatisfiesCondition(s *file_reader.Step) bool{
+func SatisfiesCondition(s *file_reader.Step) bool {
 	if s.Condition == "" {
 		return true
 	}
-
 	replaced := ReplaceVars(s.Condition)
 	boolValue, _ := strconv.ParseBool(replaced)
 
