@@ -20,7 +20,7 @@ func RunE2E() {
 			processor.GetVarsFromResponse(s.Vars, resultStep)
 			log.Infoln("Running Tests ... ")
 			testsResult := processor.ProcessTests(s.Tests)
-			processor.AddTestVar(fmt.Sprintf("%s.allTestsPassed", s.StepName), testsResult, c.TestName)
+			processor.AddTestVar(fmt.Sprintf("%s.allTestsPassed", s.StepName), testsResult, fmt.Sprintf("%s.allTestsPassed", c.TestName))
 
 			for _, tr := range testsResult {
 				testLog := fmt.Sprintf("\nName: %v \n"+
@@ -32,6 +32,7 @@ func RunE2E() {
 				processor.AppendVar(fmt.Sprintf("%s.tests", c.TestName), testLog)
 				if tr.Result {
 					processor.AppendVar(fmt.Sprintf("%s.tests.success", c.TestName), testLog)
+
 				} else {
 					processor.AppendVar(fmt.Sprintf("%s.tests.failed", c.TestName), testLog)
 				}

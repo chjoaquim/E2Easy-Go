@@ -44,15 +44,16 @@ func getValueFromResult(varName string, result StepResult) string {
 					} else {
 						bodyJson := []byte(result.Message)
 						c := make(map[string]interface{})
-						json.Unmarshal(bodyJson, &c)
+						_ = json.Unmarshal(bodyJson, &c)
 
 						parsed, _ := findMapVar(c, removeSliceItems(values, 2)...)
-						pString := fmt.Sprintf("%s", parsed)
+						pString := fmt.Sprintf("%v", parsed)
 						if strings.Contains(pString,"float64") {
 							cv, _ :=  strconv.ParseFloat(pString, 64)
 							value = fmt.Sprintf("%v", cv)
+						} else {
+							value = pString
 						}
-						value = pString
 					}
 					break
 				}
@@ -83,15 +84,16 @@ func InitGlobalVars(c file_reader.Config) {
 	for _, s := range c.Steps {
 		for n, v := range s.Vars {
 			if v == "${UUID()}" {
-				globalVars[n] = fmt.Sprintf("%s", uuid.New())
+				globalVars[n] = fmt.Sprintf("%v", uuid.New())
 			}
 		}
 	}
+
 	initGlobalTest(c.TestName)
 }
 
 func initGlobalTest(configName string) {
-	globalVars[configName] = fmt.Sprintf("%v", true)
+	globalVars[fmt.Sprintf("%v.allTestsPassed", configName)] = fmt.Sprintf("%v", true)
 }
 
 func ReplaceVars(value string) string {
@@ -104,7 +106,7 @@ func ReplaceVars(value string) string {
 }
 
 func AppendVar(varName string, value string) {
-	globalVars[varName] = globalVars[varName] + value
+	globalVars[varName] = fmt.Sprintf("%v %v", globalVars[varName], value)
 }
 
 func removeSliceItems(slice []string, n int) []string {
