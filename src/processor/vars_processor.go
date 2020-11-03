@@ -1,10 +1,11 @@
 package processor
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
+	"github.com/valyala/fastjson"
 	"strconv"
 	"strings"
 )
@@ -31,6 +32,7 @@ func GetValueOfVar(varName string) string {
 }
 
 func getValueFromResult(varName string, result StepResult) string {
+	varName = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(varName, "[", "."), "]", "."), "..", ".")
 	values := strings.Split(varName, ".")
 	var value string
 	switch values[0] {
@@ -42,18 +44,13 @@ func getValueFromResult(varName string, result StepResult) string {
 					if len(values) == 2 {
 						return result.Message
 					} else {
-						bodyJson := []byte(result.Message)
-						c := make(map[string]interface{})
-						_ = json.Unmarshal(bodyJson, &c)
-
-						parsed, _ := findMapVar(c, removeSliceItems(values, 2)...)
-						pString := fmt.Sprintf("%v", parsed)
-						if strings.Contains(pString,"float64") {
-							cv, _ :=  strconv.ParseFloat(pString, 64)
-							value = fmt.Sprintf("%v", cv)
-						} else {
-							value = pString
+						var p fastjson.Parser
+						bodyJson, err := p.Parse(result.Message)
+						if err != nil {
+							log.Error(err)
 						}
+						result := bodyJson.Get(removeSliceItems(values, 2)...)
+						value = fmt.Sprintf("%v", result)
 					}
 					break
 				}
@@ -116,21 +113,4 @@ func removeSliceItems(slice []string, n int) []string {
 		i += 1
 	}
 	return slice
-}
-
-func findMapVar(m map[string]interface{}, ks ...string) (rval interface{}, err error) {
-	var ok bool
-
-	if len(ks) == 0 {
-		return nil, fmt.Errorf("%s needs at least one key", m)
-	}
-	if rval, ok = m[ks[0]]; !ok {
-		return nil, fmt.Errorf("key not found; remaining keys: %v", ks)
-	} else if len(ks) == 1 { // we've reached the final key
-		return rval, nil
-	} else if m, ok = rval.(map[string]interface{}); !ok {
-		return nil, fmt.Errorf("malformed structure at %#v", rval)
-	} else { // 1+ more keys
-		return findMapVar(m, ks[1:]...)
-	}
 }
