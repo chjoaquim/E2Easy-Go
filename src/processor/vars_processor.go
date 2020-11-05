@@ -80,6 +80,7 @@ func AddTestVar(varName string, testResult []TestResult, configName string) {
 func InitGlobalVars(c file_reader.Config) {
 	for _, s := range c.Steps {
 		for n, v := range s.Vars {
+			AddVar(strings.TrimSpace(n), strings.TrimSpace(v))
 			if v == "${UUID()}" {
 				globalVars[n] = fmt.Sprintf("%v", uuid.New())
 			}
@@ -100,6 +101,10 @@ func ReplaceVars(value string) string {
 		}
 	}
 	return value
+}
+
+func AddVar(varName string, value string) {
+	globalVars[varName] = value
 }
 
 func AppendVar(varName string, value string) {
