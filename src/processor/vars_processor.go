@@ -8,6 +8,7 @@ import (
 	"github.com/valyala/fastjson"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -18,7 +19,9 @@ func GetVarsFromResponse(expectedVars map[string]string, result StepResult) map[
 	if len(expectedVars) > 0 {
 		for k, v := range expectedVars {
 			evaluated := getValueFromResult(v, result)
-			globalVars[k] = evaluated
+			if evaluated != "" {
+				globalVars[k] = evaluated
+			}
 		}
 	}
 
@@ -81,13 +84,66 @@ func InitGlobalVars(c file_reader.Config) {
 	for _, s := range c.Steps {
 		for n, v := range s.Vars {
 			AddVar(strings.TrimSpace(n), strings.TrimSpace(v))
+
 			if v == "${UUID()}" {
 				globalVars[n] = fmt.Sprintf("%v", uuid.New())
+			}
+			if strings.Contains(v, "Instant.now()") {
+				globalVars[n] = calculateInstantValue(v)
 			}
 		}
 	}
 
 	initGlobalTest(c.TestName)
+}
+
+func calculateInstantValue(command string) string {
+	spt := strings.Split(command, ".")
+	result := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	if len(spt) > 2 {
+		if strings.Contains(spt[2], "plus") {
+			calculatedTime := plusValueToTime(time.Now().UTC(), getTimeAmount(spt[2]), getTimeUnit(command))
+			result = calculatedTime.Format("2006-01-02T15:04:05.000Z")
+		}
+		if strings.Contains(spt[2], "minus") {
+			calculatedTime := plusValueToTime(time.Now().UTC(), -1*getTimeAmount(spt[2]), getTimeUnit(command))
+			result = calculatedTime.Format("2006-01-02T15:04:05.000Z")
+		}
+	}
+
+	return result
+}
+
+func getTimeAmount(value string) int64 {
+	value = strings.ReplaceAll(value, "plus(", ",")
+	value = strings.ReplaceAll(value, "minus(", ",")
+	valueToAdd, _ := strconv.ParseInt(strings.Split(value,",")[1], 10, 64)
+	return valueToAdd
+}
+
+func getTimeUnit(value string) string {
+	if strings.Contains(value, "HOURS") {
+		return "HOURS"
+	}
+	if strings.Contains(value, "DAYS") {
+		return "DAYS"
+	}
+	return ""
+}
+
+func plusValueToTime(oldTime time.Time, value int64, temp string) time.Time {
+	var newDate = oldTime
+	switch temp {
+	case "HOURS":
+		{
+			newDate = oldTime.Add(time.Hour * time.Duration(value))
+		}
+	case "DAYS":
+		{
+			newDate = oldTime.AddDate(0,0, int(value))
+		}
+	}
+	return newDate
 }
 
 func initGlobalTest(configName string) {
