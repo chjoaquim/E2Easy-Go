@@ -2,9 +2,11 @@ package rest
 
 import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
+	"github.com/carloshjoaquim/E2Easy-Go/src/processor"
 	resty "github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -12,7 +14,7 @@ var (
 	restClient = resty.New().
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
-		SetTimeout(10000 * time.Millisecond)
+		SetTimeout(getTimeout() * time.Millisecond)
 )
 
 type CallerResponse struct {
@@ -96,5 +98,15 @@ func setHeaders(headers []file_reader.Headers) {
 		for _, header := range headers {
 			restClient.SetHeader(header.Name, header.Value)
 		}
+	}
+}
+
+func getTimeout() time.Duration {
+	timeout := processor.GetValueOfVar("timeout")
+	if timeout != "" {
+		conv,_ := strconv.ParseInt(timeout, 10, 64)
+		return time.Duration(conv)
+	} else {
+		return 1000
 	}
 }
