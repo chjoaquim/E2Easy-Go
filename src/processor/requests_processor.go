@@ -4,6 +4,7 @@ import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
 	"github.com/carloshjoaquim/E2Easy-Go/src/rest"
 	log "github.com/sirupsen/logrus"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -21,7 +22,7 @@ func RunStep(step file_reader.Step) StepResult {
 	switch step.Method {
 	case "GET":
 		{
-			result, err := rest.Get(ReplaceVars(step.Path), step.Headers)
+			result, err := rest.Get(ReplaceVars(step.Path), step.Headers, getTimeoutInMilliseconds())
 			if err != nil {
 				log.Errorf("Error when trying to execute a GET request %v", err)
 				stepResult = getErrorResult(err)
@@ -31,7 +32,7 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "POST":
 		{
-			result, err := rest.Post(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers)
+			result, err := rest.Post(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers, getTimeoutInMilliseconds())
 			if err != nil {
 				log.Errorf("Error when trying to execute a POST request %v", err)
 				stepResult = getErrorResult(err)
@@ -41,7 +42,7 @@ func RunStep(step file_reader.Step) StepResult {
 		}
 	case "PUT":
 		{
-			result, err := rest.Put(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers)
+			result, err := rest.Put(ReplaceVars(step.Path), strings.ReplaceAll(ReplaceVars(step.Body), "\n", "\\n"), step.Headers, getTimeoutInMilliseconds())
 			if err != nil {
 				log.Errorf("Error when trying to execute a PUT request %v", err)
 				stepResult = getErrorResult(err)
@@ -68,5 +69,15 @@ func getSuccessResult(result *rest.CallerResponse) StepResult {
 		Message:    string(result.Body),
 		Time:       result.RequestDuration,
 		StatusCode: result.StatusCode,
+	}
+}
+
+func getTimeoutInMilliseconds() time.Duration {
+	timeout := GetValueOfVar("timeout")
+	if timeout != "" {
+		conv,_ := strconv.ParseInt(timeout, 10, 64)
+		return time.Duration(conv) * time.Millisecond
+	} else {
+		return 10000 * time.Millisecond
 	}
 }

@@ -2,11 +2,9 @@ package rest
 
 import (
 	"github.com/carloshjoaquim/E2Easy-Go/src/file_reader"
-	"github.com/carloshjoaquim/E2Easy-Go/src/processor"
 	resty "github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -14,7 +12,7 @@ var (
 	restClient = resty.New().
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
-		SetTimeout(getTimeout() * time.Millisecond)
+		SetTimeout(10000 * time.Millisecond)
 )
 
 type CallerResponse struct {
@@ -28,9 +26,10 @@ func GetRestClient() *http.Client {
 	return restClient.GetClient()
 }
 
-func Post(path string, body string, headers []file_reader.Headers) (*CallerResponse, error) {
+func Post(path string, body string, headers []file_reader.Headers, timeout time.Duration) (*CallerResponse, error) {
 	setHeaders(headers)
 	response, err := restClient.
+		SetTimeout(timeout).
 		SetHostURL(path).R().
 		SetBody(body).
 		Post("")
@@ -50,9 +49,10 @@ func Post(path string, body string, headers []file_reader.Headers) (*CallerRespo
 	return callerResponse, nil
 }
 
-func Put(path string, body string, headers []file_reader.Headers) (*CallerResponse, error) {
+func Put(path string, body string, headers []file_reader.Headers, timeout time.Duration) (*CallerResponse, error) {
 	setHeaders(headers)
 	response, err := restClient.
+		SetTimeout(timeout).
 		SetHostURL(path).R().
 		SetBody(body).
 		Put("")
@@ -72,9 +72,10 @@ func Put(path string, body string, headers []file_reader.Headers) (*CallerRespon
 	return callerResponse, nil
 }
 
-func Get(path string, headers []file_reader.Headers) (*CallerResponse, error) {
+func Get(path string, headers []file_reader.Headers, timeout time.Duration) (*CallerResponse, error) {
 	setHeaders(headers)
 	response, err := restClient.
+		SetTimeout(timeout).
 		SetHostURL(path).R().
 		Get("")
 
@@ -98,15 +99,5 @@ func setHeaders(headers []file_reader.Headers) {
 		for _, header := range headers {
 			restClient.SetHeader(header.Name, header.Value)
 		}
-	}
-}
-
-func getTimeout() time.Duration {
-	timeout := processor.GetValueOfVar("timeout")
-	if timeout != "" {
-		conv,_ := strconv.ParseInt(timeout, 10, 64)
-		return time.Duration(conv)
-	} else {
-		return 1000
 	}
 }

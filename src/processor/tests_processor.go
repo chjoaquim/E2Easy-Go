@@ -28,43 +28,47 @@ func ProcessTests(tests []file_reader.Tests) []TestResult {
 		switch strings.ToUpper(t.Type) {
 		case "EQUALS":
 			{
+				var actual = GetValueOfVar(t.Actual)
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
 					Expected: t.Expected,
-					Actual:   GetValueOfVar(t.Actual),
-					Result:   verifyEquals(t.Expected, GetValueOfVar(t.Actual)),
+					Actual:   actual,
+					Result:   verifyEquals(t.Expected, actual),
 				})
 
 			}
 		case "CONTAINS":
 			{
+				var actual = GetValueOfVar(t.Actual)
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
 					Expected: t.Expected,
-					Actual:   GetValueOfVar(t.Actual),
-					Result:   verifyContains(t.Expected, GetValueOfVar(t.Actual)),
+					Actual:   actual,
+					Result:   verifyContains(t.Expected, actual),
 				})
 			}
 		case "NOT_NIL":
 			{
+				var actual = GetValueOfVar(t.Actual)
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
 					Expected: "NOT_NIL",
-					Actual:   GetValueOfVar(t.Actual),
-					Result:   verifyNotNil(GetValueOfVar(t.Actual)),
+					Actual:   actual,
+					Result:   verifyNotNil(actual),
 				})
 			}
 		case "NIL":
 			{
+				var actual = GetValueOfVar(t.Actual)
 				testResults = append(testResults, TestResult{
 					Name:     t.Name,
 					Type:     t.Type,
 					Expected: "NIL",
-					Actual:   GetValueOfVar(t.Actual),
-					Result:   verifyNil(GetValueOfVar(t.Actual)),
+					Actual:   actual,
+					Result:   verifyNil(actual),
 				})
 			}
 		}
@@ -86,7 +90,7 @@ func verifyNil(actual interface{}) bool {
 }
 
 func verifyNotNil(actual interface{}) bool {
-	return actual != nil
+	return actual != nil && actual != "<nil>"
 }
 
 func SatisfiesCondition(s *file_reader.Step) bool {
